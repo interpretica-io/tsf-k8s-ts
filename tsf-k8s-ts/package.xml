@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<package version="1.0">
+    <description>tsf-k8s-ts Kubernetes security suite</description>
+    <!-- @page k8s-ts Kubernetes Suite
+          @objective Audit a single-node Kubernetes cluster (k3s, brought up
+                     in Docker on the agent) the way an unauthenticated
+                     network peer would see it.
+          @par Test Groups:
+          - @ref k8s-group - anonymous API access, anonymous RBAC, and an
+            unauthenticated kubelet, each with a known-bad control.
+          @par Notes:
+          - The cluster is brought up and torn down by the group; with no
+            Docker the group skips cleanly.
+          - The audits read only; authorized use only.
+    -->
+    <author mailto="maxim.menshikov@interpretica.io" />
+    <session track_conf="silent">
+        <prologue><script name="prologue"><objective>Prepare the test environment.</objective></script></prologue>
+        <epilogue><script name="epilogue"><objective>Finalize the test environment.</objective></script></epilogue>
+        <run><package name="k8s" /></run>
+    </session>
+</package>

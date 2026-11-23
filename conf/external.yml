@@ -1,0 +1,29 @@
+# External TE repositories this suite builds on.
+#
+# The suite keeps all of its audit logic in its own lib and tests. It runs
+# docker, curl and kubectl on the agent through tsf_devtool (a tool runner
+# over the agent's job RPCs), and turns what it reads into security findings
+# through tsf_cybersec. tsf_cybersec is built on tsf_kernel, which is built
+# on tsf_devtool, so the whole chain is listed here, engine-side only. No
+# agent-side library of its own is needed: the stock job RPCs start the
+# tools.
+#
+# Point a url at a local checkout to test uncommitted work: git clones a
+# filesystem path as readily as a URL, and scripts/run.sh mounts the
+# sibling directory into the build container so the path exists there too.
+repositories:
+  - name: tsf_devtool
+    url: https://github.com/interpretica-io/tsf-devtool.git
+    ref: main
+    libs:
+      - tapi_devtool
+  - name: tsf_kernel
+    url: https://github.com/interpretica-io/tsf-kernel.git
+    ref: main
+    libs:
+      - tapi_kernel
+  - name: tsf_cybersec
+    url: https://github.com/interpretica-io/tsf-cybersec.git
+    ref: main
+    libs:
+      - tapi_cybersec

@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<package version="1.0">
+    <description>Kubernetes API and kubelet security audits</description>
+    <!-- @page k8s-group Kubernetes
+          @objective Audit a single-node k3s cluster (brought up in Docker)
+                     for anonymous API access, dangerous RBAC grants to
+                     anonymous principals, and an unauthenticated kubelet.
+          @par Each audit runs twice:
+          - profile=baseline - the secure cluster as the prologue left it;
+            the audit passes;
+          - profile=open - a reversible known-bad control (an anonymous
+            cluster-admin binding, or a cluster with an open kubelet) that
+            makes the finding fire; the audit fails, and the TRC records
+            that failure as expected.
+    -->
+    <author mailto="maxim.menshikov@interpretica.io" />
+    <session track_conf="silent">
+        <prologue>
+            <script name="prologue">
+                <objective>Bring a single-node k3s cluster up in Docker; skip the group if it will not come up.</objective>
+            </script>
+        </prologue>
+        <epilogue>
+            <script name="epilogue">
+                <objective>Tear the Kubernetes cluster(s) down.</objective>
+            </script>
+        </epilogue>
+        <run>
+            <script name="anon_api">
+                <objective>SECURITY: anonymous reads of the API server (secrets, pods, namespaces, RBAC) must be denied.</objective>
+            </script>
+            <arg name="profile"><value>baseline</value><value>open</value></arg>
+        </run>
+        <run>
+            <script name="rbac">
+                <objective>SECURITY: the authorizer must grant system:anonymous none of the dangerous verbs.</objective>
+            </script>
+            <arg name="profile"><value>baseline</value><value>open</value></arg>
+        </run>
+        <run>
+            <script name="anon_kubelet">
+                <objective>SECURITY: the kubelet must reject unauthenticated reads of /pods, /runningpods and /metrics.</objective>
+            </script>
+            <arg name="profile"><value>baseline</value><value>open</value></arg>
+        </run>
+    </session>
+</package>

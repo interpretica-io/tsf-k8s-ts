@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<trc_db unknown_exp_status="passed_ok">
+  <test name="tsf-k8s-ts" type="package">
+    <objective>Kubernetes API and kubelet security suite</objective>
+    <notes />
+    <iter result="PASSED">
+      <notes />
+      <test name="prologue" type="script">
+        <objective>Test suite prologue</objective>
+        <notes />
+        <iter result="PASSED"><notes /></iter>
+      </test>
+      <test name="k8s" type="package">
+        <objective>Kubernetes API and kubelet security audits</objective>
+        <notes />
+        <iter result="PASSED">
+          <notes />
+          <test name="prologue" type="script">
+            <objective>Bring a single-node k3s cluster up in Docker; skip the group if it will not come up</objective>
+            <notes />
+            <iter result="PASSED"><notes /></iter>
+          </test>
+
+          <test name="anon_api" type="script">
+            <objective>SECURITY: anonymous reads of the API server must be denied</objective>
+            <notes />
+            <iter result="PASSED">
+              <arg name="profile">baseline</arg>
+              <notes>The secure cluster denies every anonymous sensitive read (403); only /version is served, as INFO.</notes>
+            </iter>
+            <iter result="FAILED">
+              <arg name="profile">open</arg>
+              <notes>KNOWN FINDING (control). With cluster-admin bound to
+                     system:anonymous, the API server serves Secrets and the
+                     rest of the inventory to an unauthenticated peer. A
+                     SKIPPED here means Docker/k3s was not available.</notes>
+              <results>
+                <result value="FAILED">
+                  <verdict>security check k8s.anon-read-secrets failed for /api/v1/secrets</verdict>
+                </result>
+                <result value="SKIPPED" />
+              </results>
+            </iter>
+          </test>
+
+          <test name="rbac" type="script">
+            <objective>SECURITY: the authorizer must grant system:anonymous none of the dangerous verbs</objective>
+            <notes />
+            <iter result="PASSED">
+              <arg name="profile">baseline</arg>
+              <notes>The secure cluster allows system:anonymous none of the dangerous verb/resource pairs.</notes>
+            </iter>
+            <iter result="FAILED">
+              <arg name="profile">open</arg>
+              <notes>KNOWN FINDING (control). With cluster-admin bound to
+                     system:anonymous, the authorizer answers "yes" to every
+                     dangerous check. A SKIPPED here means Docker/k3s was not
+                     available.</notes>
+              <results>
+                <result value="FAILED">
+                  <verdict>security check k8s.rbac-anon-all failed for '*' '*'</verdict>
+                </result>
+                <result value="SKIPPED" />
+              </results>
+            </iter>
+          </test>
+
+          <test name="anon_kubelet" type="script">
+            <objective>SECURITY: the kubelet must reject unauthenticated reads</objective>
+            <notes />
+            <iter result="PASSED">
+              <arg name="profile">baseline</arg>
+              <notes>The prologue cluster's kubelet rejects anonymous reads (401).</notes>
+            </iter>
+            <iter result="FAILED">
+              <arg name="profile">open</arg>
+              <notes>KNOWN FINDING (control). A throwaway cluster whose kubelet
+                     runs with anonymous-auth=true and AlwaysAllow serves
+                     /pods and the rest to an unauthenticated peer. A SKIPPED
+                     here means the control cluster would not come up.</notes>
+              <results>
+                <result value="FAILED">
+                  <verdict>security check k8s.kubelet-anon-pods failed for /pods</verdict>
+                </result>
+                <result value="SKIPPED" />
+              </results>
+            </iter>
+          </test>
+
+          <test name="epilogue" type="script">
+            <objective>Tear the Kubernetes cluster(s) down</objective>
+            <notes />
+            <iter result="PASSED"><notes /></iter>
+          </test>
+        </iter>
+      </test>
+
+      <test name="epilogue" type="script">
+        <objective>Test suite epilogue</objective>
+        <notes />
+        <iter result="PASSED"><notes /></iter>
+      </test>
+    </iter>
+  </test>
+</trc_db>

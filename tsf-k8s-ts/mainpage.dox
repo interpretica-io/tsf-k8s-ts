@@ -1,0 +1,26 @@
+/** @mainpage
+
+This suite audits a single-node Kubernetes cluster (k3s, brought up in
+Docker on the Test Agent it runs on) the way an unauthenticated network
+peer would see it:
+
+- @ref k8s-group - three audits, each run both against the secure
+  cluster (expected to pass) and against a reversible known-bad control
+  (expected to fail, recorded in the TRC):
+  - @c anon_api - anonymous reads of the API server (secrets, pods,
+    namespaces, the RBAC bindings); the control binds @c cluster-admin
+    to @c system:anonymous;
+  - @c rbac - what the authorizer grants @c system:anonymous, read with
+    @c kubectl @c auth @c can-i; the same control;
+  - @c anon_kubelet - unauthenticated reads of the kubelet (@c /pods,
+    @c /runningpods, @c /metrics); the control is a throwaway cluster
+    whose kubelet runs with anonymous auth on.
+
+Findings are collected through tsf-cybersec and the gate fails on HIGH.
+Every audit emits an MI line-graph of the anonymous HTTP status (or the
+allowed/denied answer) per endpoint, so the HTML log draws the posture.
+
+The cluster is the suite's to bring up and tear down; with no Docker the
+group skips cleanly. The audits read only - authorized use only.
+
+*/
