@@ -8,9 +8,11 @@ fails on any finding ≥ HIGH.
 
 | Test | What it checks |
 |---|---|
-| `anon_api` | anonymous reads of the API server — `/version`, `/api`, namespaces, pods, the RBAC bindings and Secrets — must be denied (403), not served (200) |
-| `rbac` | the authorizer (`kubectl auth can-i --as=system:anonymous`) must grant `system:anonymous` none of the dangerous verb/resource pairs (`* *`, get secrets, create pods, create ClusterRoleBindings, node proxy, impersonate) |
-| `anon_kubelet` | the kubelet must reject unauthenticated reads of `/pods`, `/runningpods` and `/metrics` (401) |
+| `anon_api` | anonymous reads of the API server — `/version`, `/healthz`, `/livez`, `/api`, namespaces, pods, configmaps, deployments, the RBAC bindings and Secrets — must be denied (403), not served (200) |
+| `anon_metrics` | the API server must not serve `/metrics` (Prometheus telemetry) to an anonymous peer; the health endpoints are public and recorded only as INFO |
+| `rbac` | the authorizer (`kubectl auth can-i --as=system:anonymous`) must grant `system:anonymous` none of the dangerous verb/resource pairs (`* *`, get/create secrets, get configmaps, create pods, pods/exec, create ClusterRoleBindings, node proxy, impersonate, get nodes) |
+| `anon_kubelet` | the kubelet must reject unauthenticated reads of `/pods`, `/runningpods`, `/stats/summary`, `/configz`, `/metrics` and `/metrics/cadvisor` (401) |
+| `kubelet_exec` | the kubelet must not authorize an unauthenticated command exec (`POST /run/...`); a secure kubelet refuses with 401 |
 
 Each audit runs twice, selected by the `profile` argument:
 

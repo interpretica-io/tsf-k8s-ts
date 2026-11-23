@@ -199,21 +199,59 @@ tsapi_k8s_ts_http_code(tsapi_k8s_ts *s, const char *url, long *code)
     return rc;
 }
 
+/* See description in tsapi_k8s_ts.h */
+te_errno
+tsapi_k8s_ts_http_post_code(tsapi_k8s_ts *s, const char *url,
+                            const char *body, long *code)
+{
+    te_string cmd = TE_STRING_INIT;
+    te_string out = TE_STRING_INIT;
+    int status = -1;
+    te_errno rc;
+
+    if (code != NULL)
+        *code = 0;
+
+    te_string_append(&cmd,
+        "curl -sk -o /dev/null --max-time 20 -w '%%{http_code}' -X POST ");
+    if (body != NULL && body[0] != '\0')
+        te_string_append(&cmd, "--data '%s' ", body);
+    te_string_append(&cmd, "'%s'", url);
+
+    rc = tsapi_k8s_ts_sh(s, cmd.ptr, 40000, &out, &status);
+    te_string_free(&cmd);
+
+    if (rc == 0 && code != NULL && out.ptr != NULL)
+        *code = strtol(out.ptr, NULL, 10);
+
+    te_string_free(&out);
+    return rc;
+}
+
 /* ---- kubectl ---- */
+
+/* See description in tsapi_k8s_ts.h */
+te_errno
+tsapi_k8s_ts_kubectl_ct(tsapi_k8s_ts *s, const char *ct, const char *args,
+                        int timeout_ms, te_string *out, int *status)
+{
+    te_string cmd = TE_STRING_INIT;
+    te_errno rc;
+
+    te_string_append(&cmd, "docker exec %s kubectl %s", ct, args);
+    rc = tsapi_k8s_ts_sh(s, cmd.ptr, timeout_ms, out, status);
+    te_string_free(&cmd);
+
+    return rc;
+}
 
 /* See description in tsapi_k8s_ts.h */
 te_errno
 tsapi_k8s_ts_kubectl(tsapi_k8s_ts *s, const char *args, int timeout_ms,
                      te_string *out, int *status)
 {
-    te_string cmd = TE_STRING_INIT;
-    te_errno rc;
-
-    te_string_append(&cmd, "docker exec " TSAPI_K8S_K3S_CT " kubectl %s", args);
-    rc = tsapi_k8s_ts_sh(s, cmd.ptr, timeout_ms, out, status);
-    te_string_free(&cmd);
-
-    return rc;
+    return tsapi_k8s_ts_kubectl_ct(s, TSAPI_K8S_K3S_CT, args, timeout_ms,
+                                   out, status);
 }
 
 /* ---- the clusters ---- */

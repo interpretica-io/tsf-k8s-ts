@@ -43,6 +43,28 @@
             </iter>
           </test>
 
+          <test name="anon_metrics" type="script">
+            <objective>SECURITY: the API server must not serve /metrics anonymously</objective>
+            <notes />
+            <iter result="PASSED">
+              <arg name="profile">baseline</arg>
+              <notes>The secure cluster denies anonymous /metrics (403); only the health endpoints are served, as INFO.</notes>
+            </iter>
+            <iter result="FAILED">
+              <arg name="profile">open</arg>
+              <notes>KNOWN FINDING (control). With cluster-admin bound to
+                     system:anonymous, /metrics is served to an
+                     unauthenticated peer. A SKIPPED here means Docker/k3s was
+                     not available.</notes>
+              <results>
+                <result value="FAILED">
+                  <verdict>security check k8s.anon-metrics failed for /metrics</verdict>
+                </result>
+                <result value="SKIPPED" />
+              </results>
+            </iter>
+          </test>
+
           <test name="rbac" type="script">
             <objective>SECURITY: the authorizer must grant system:anonymous none of the dangerous verbs</objective>
             <notes />
@@ -81,6 +103,30 @@
               <results>
                 <result value="FAILED">
                   <verdict>security check k8s.kubelet-anon-pods failed for /pods</verdict>
+                </result>
+                <result value="SKIPPED" />
+              </results>
+            </iter>
+          </test>
+
+          <test name="kubelet_exec" type="script">
+            <objective>SECURITY: the kubelet must not authorize an unauthenticated exec</objective>
+            <notes />
+            <iter result="PASSED">
+              <arg name="profile">baseline</arg>
+              <notes>The prologue cluster's kubelet refuses the exec (401).</notes>
+            </iter>
+            <iter result="FAILED">
+              <arg name="profile">open</arg>
+              <notes>KNOWN FINDING (control). A throwaway cluster whose kubelet
+                     runs with anonymous-auth=true and AlwaysAllow authorizes
+                     an unauthenticated exec (a 200, or a 500 from inside the
+                     container - either way the request was authorized). A
+                     SKIPPED here means the control cluster would not come up
+                     or no running pod was found.</notes>
+              <results>
+                <result value="FAILED">
+                  <verdict>security check k8s.kubelet-anon-exec failed for /run</verdict>
                 </result>
                 <result value="SKIPPED" />
               </results>

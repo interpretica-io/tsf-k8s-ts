@@ -181,6 +181,38 @@ extern te_errno tsapi_k8s_ts_kubectl(tsapi_k8s_ts *s, const char *args,
 extern te_errno tsapi_k8s_ts_http_code(tsapi_k8s_ts *s, const char *url,
                                        long *code);
 
+/**
+ * Make an unauthenticated HTTPS @c POST of @p url from the agent with
+ * @c curl (TLS verification off) sending @p body, and read back the HTTP
+ * status code.
+ *
+ * @param[in]  s     Session.
+ * @param[in]  url   Full URL.
+ * @param[in]  body  Request body (a short ASCII string), or @c NULL.
+ * @param[out] code  HTTP status code, or 0 if the server did not answer.
+ *
+ * @return Status code of running curl.
+ */
+extern te_errno tsapi_k8s_ts_http_post_code(tsapi_k8s_ts *s, const char *url,
+                                            const char *body, long *code);
+
+/**
+ * Run @c kubectl inside a named k3s container (@ref TSAPI_K8S_K3S_CT or
+ * @ref TSAPI_K8S_K3S_INS_CT), as its cluster administrator.
+ *
+ * @param[in]  s          Session.
+ * @param[in]  ct         Container name.
+ * @param[in]  args       Arguments after @c kubectl, as one shell string.
+ * @param[in]  timeout_ms Timeout, ms.
+ * @param[out] out        Stdout, trimmed (may be @c NULL).
+ * @param[out] status     kubectl exit status, or -1 (may be @c NULL).
+ *
+ * @return Status code of running the command.
+ */
+extern te_errno tsapi_k8s_ts_kubectl_ct(tsapi_k8s_ts *s, const char *ct,
+                                        const char *args, int timeout_ms,
+                                        te_string *out, int *status);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

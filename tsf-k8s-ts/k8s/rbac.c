@@ -64,6 +64,18 @@ static const rbac_check checks[] = {
     { "impersonate users",
       "k8s.rbac-anon-impersonate", TAPI_CYBERSEC_SEV_HIGH,
       "impersonate any user" },
+    { "get configmaps -A",
+      "k8s.rbac-anon-get-configmaps", TAPI_CYBERSEC_SEV_HIGH,
+      "read ConfigMaps in every namespace" },
+    { "create secrets -A",
+      "k8s.rbac-anon-create-secrets", TAPI_CYBERSEC_SEV_HIGH,
+      "create Secrets in every namespace" },
+    { "'*' pods/exec",
+      "k8s.rbac-anon-pod-exec",   TAPI_CYBERSEC_SEV_CRITICAL,
+      "exec into a running pod" },
+    { "get nodes",
+      "k8s.rbac-anon-get-nodes",  TAPI_CYBERSEC_SEV_MEDIUM,
+      "enumerate the cluster's nodes" },
 };
 
 /** Ask the authorizer one question; @p allowed is set to "can anonymous?". */

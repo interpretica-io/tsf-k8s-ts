@@ -32,6 +32,12 @@
             <arg name="profile"><value>baseline</value><value>open</value></arg>
         </run>
         <run>
+            <script name="anon_metrics">
+                <objective>SECURITY: the API server must not serve /metrics to an anonymous peer.</objective>
+            </script>
+            <arg name="profile"><value>baseline</value><value>open</value></arg>
+        </run>
+        <run>
             <script name="rbac">
                 <objective>SECURITY: the authorizer must grant system:anonymous none of the dangerous verbs.</objective>
             </script>
@@ -39,7 +45,13 @@
         </run>
         <run>
             <script name="anon_kubelet">
-                <objective>SECURITY: the kubelet must reject unauthenticated reads of /pods, /runningpods and /metrics.</objective>
+                <objective>SECURITY: the kubelet must reject unauthenticated reads of /pods, /runningpods, /stats, /configz and /metrics.</objective>
+            </script>
+            <arg name="profile"><value>baseline</value><value>open</value></arg>
+        </run>
+        <run>
+            <script name="kubelet_exec">
+                <objective>SECURITY: the kubelet must not authorize an unauthenticated command exec (/run).</objective>
             </script>
             <arg name="profile"><value>baseline</value><value>open</value></arg>
         </run>

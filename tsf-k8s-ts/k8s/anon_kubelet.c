@@ -53,9 +53,18 @@ static const kendpoint endpoints[] = {
     { "/runningpods/",
       "k8s.kubelet-anon-running", TAPI_CYBERSEC_SEV_HIGH,
       "the running pods on the node" },
+    { "/stats/summary",
+      "k8s.kubelet-anon-stats",   TAPI_CYBERSEC_SEV_HIGH,
+      "per-container resource stats (names, namespaces, volumes)" },
+    { "/configz",
+      "k8s.kubelet-anon-configz", TAPI_CYBERSEC_SEV_HIGH,
+      "the kubelet's own configuration" },
     { "/metrics",
       "k8s.kubelet-anon-metrics", TAPI_CYBERSEC_SEV_MEDIUM,
       "node and workload metrics" },
+    { "/metrics/cadvisor",
+      "k8s.kubelet-anon-cadvisor", TAPI_CYBERSEC_SEV_MEDIUM,
+      "cAdvisor container metrics" },
 };
 
 int

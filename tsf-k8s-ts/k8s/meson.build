@@ -1,5 +1,5 @@
 # Copyright (C) 2026 Interpretica Unipessoal Lda
-tests = [ 'prologue', 'epilogue', 'anon_api', 'rbac', 'anon_kubelet' ]
+tests = [ 'prologue', 'epilogue', 'anon_api', 'anon_metrics', 'rbac', 'anon_kubelet', 'kubelet_exec' ]
 foreach test : tests
     test_exe = test
     test_c = test + '.c'
